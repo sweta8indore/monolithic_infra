@@ -38,6 +38,8 @@ module "database" {
 
   location = var.location
   rg_name  = var.rg_name
+  
+  depends_on = [ module.rg ]
  
 }
 

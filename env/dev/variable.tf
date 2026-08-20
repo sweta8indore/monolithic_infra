@@ -2,7 +2,9 @@ variable "rg_name" {}
 variable "location" {}
 
 variable "vnet_name" {}
-variable "address_space" {}
+variable "address_space" {
+  type = list(string)
+}
 
 variable "admin_username" {}
 variable "admin_password" {}
