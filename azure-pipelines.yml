@@ -15,7 +15,7 @@ stages:
         backendServiceArm: 'cicdinfra_sc'
         backendAzureRmStorageAccountName: 'terraformstatefile55'
         backendAzureRmContainerName: 'tfstate'
-        backendAzureRmKey: 'dev.tfstate'
+        backendAzureRmKey: 'dev.terraform.state'
 
     - task: TerraformTask@5
       inputs:
