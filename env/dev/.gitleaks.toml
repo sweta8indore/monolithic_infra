@@ -1,0 +1,5 @@
+[[rules]]
+id = "terraform-hardcoded-password"
+description = "Hardcoded Terraform password"
+regex = '''(?i)(admin_password|password|secret_password)\s*=\s*["'][^"']+["']'''
+keywords = ["admin_password", "password", "secret_password"]
