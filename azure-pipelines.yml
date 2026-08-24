@@ -52,6 +52,8 @@ stages:
     displayName: "TFlint scanning tool"
     steps:
       - task: PowerShell@2
+        env:
+          SKIP_TFLINT: $(SKIP_TFLINT)
         inputs:
           targetType: 'inline'
           script: |
