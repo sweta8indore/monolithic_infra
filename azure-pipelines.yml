@@ -25,34 +25,34 @@ stages:
         environmentServiceNameAzureRM: 'cicdinfra_sc'
 
 
-- stage: manualvlidation
-  pool: server
-  jobs:
-  - job: manualvalidate
-    steps:
-    - task: ManualValidation@1
-      inputs:
-        notifyUsers: 'manoj@nevalosstechnologies.com'
-        approvers: 'manoj@nevalosstechnologies.com'
+# - stage: manualvlidation
+#   pool: server
+#   jobs:
+#   - job: manualvalidate
+#     steps:
+#     - task: ManualValidation@1
+#       inputs:
+#         notifyUsers: 'manoj@nevalosstechnologies.com'
+#         approvers: 'manoj@nevalosstechnologies.com'
 
-- stage: initandapply
-  jobs:
-  - job: init
-    steps: 
-    - task: TerraformTask@5
-      inputs:
-        provider: 'azurerm'
-        command: 'init'
-        workingDirectory: '$(System.DefaultWorkingDirectory)/env/dev'
-        backendServiceArm: 'cicdinfra_sc'
-        backendAzureRmStorageAccountName: 'terraformstatefile55'
-        backendAzureRmContainerName: 'tfstate'
-        backendAzureRmKey: 'dev.terraform.state'
+# - stage: initandapply
+#   jobs:
+#   - job: init
+#     steps: 
+#     - task: TerraformTask@5
+#       inputs:
+#         provider: 'azurerm'
+#         command: 'init'
+#         workingDirectory: '$(System.DefaultWorkingDirectory)/env/dev'
+#         backendServiceArm: 'cicdinfra_sc'
+#         backendAzureRmStorageAccountName: 'terraformstatefile55'
+#         backendAzureRmContainerName: 'tfstate'
+#         backendAzureRmKey: 'dev.terraform.state'
 
-    - task: TerraformTask@5
-      inputs:
-        provider: 'azurerm'
-        command: 'destroy'
-        workingDirectory: '$(System.DefaultWorkingDirectory)/env/dev'
-        commandOptions: '-auto-approve'
-        environmentServiceNameAzureRM: 'cicdinfra_sc'
+#     - task: TerraformTask@5
+#       inputs:
+#         provider: 'azurerm'
+#         command: 'destroy'
+#         workingDirectory: '$(System.DefaultWorkingDirectory)/env/dev'
+#         commandOptions: '-auto-approve'
+#         environmentServiceNameAzureRM: 'cicdinfra_sc'
