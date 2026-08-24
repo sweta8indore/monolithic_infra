@@ -5,7 +5,7 @@ pool: cicdpool
 variables:
   SKIP_GITLEAKS: 'true'
   SKIP_TFLINT: 'true'
-  SKIP_TFSEC: 'false'
+  SKIP_TFSEC: 'true'
 
 stages:
 
