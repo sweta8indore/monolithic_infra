@@ -50,6 +50,7 @@ stages:
           Write-Host "Gitleaks scan passed successfully."
 
   - job: tflint
+    dependsOn: gitleaks
     displayName: "TFlint scanning tool"
     steps:    
       - task: PowerShell@2
@@ -80,6 +81,7 @@ stages:
             Write-Host "TFLint scan passed successfully."
 
   - job: tfsec
+    dependsOn: tflint
     displayName: "TFsec scanning tool"
     steps: 
     - task: PowerShell@2
@@ -115,6 +117,7 @@ stages:
 # ============================================================
 
 - stage: initandplan
+  dependsOn: scanningtools
   displayName: "Terraform Init and Plan"
 
   jobs:
