@@ -4,6 +4,7 @@ pool: cicdpool
 
 variables:
   SKIP_GITLEAKS: 'true'
+  SKIP_TFLINT: 'false'
 
 stages:
 
@@ -46,6 +47,30 @@ stages:
           }
 
           Write-Host "Gitleaks scan passed successfully."
+
+  - job: tflint
+    displayName: "TFlint scanning tool"
+    steps:
+      - task: PowerShell@2
+        inputs:
+          targetType: 'inline'
+          script: |
+            if ("$(SKIP_TFLINT)" -eq "true") {
+                      Write-Host "WARNING: TFLint scan has been intentionally skipped."
+                      exit 0
+                  }
+            
+                  Write-Host "Running TFLint Terraform scan..."
+            
+                  tflint --chdir=env/dev --format compact
+            
+                  if ($LASTEXITCODE -ne 0) {
+                      Write-Host "##vso[task.logissue type=error]TFLint found Terraform issues!"
+                      Write-Host "##vso[task.complete result=Failed;]TFLint Scan Failed"
+                      exit 1
+                  }
+            
+                  Write-Host "TFLint scan passed successfully."
 
 
 # ============================================================
