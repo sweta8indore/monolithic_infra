@@ -3,6 +3,31 @@ trigger: none
 pool: cicdpool  
 
 stages:
+- stage: scanningtools
+  jobs:
+  - job: gitleaks
+    steps: 
+    - task: PowerShell@2
+      inputs:
+        targetType: 'inline'
+        script: |
+          Write-Host "Running Gitleaks secret scan..."
+          
+                gitleaks detect `
+                  --source . `
+                  --config .gitleaks.toml `
+                  --verbose `
+                  --redact `
+                  --exit-code 1
+          
+                if ($LASTEXITCODE -ne 0) {
+                    Write-Host "##vso[task.logissue type=error]Gitleaks detected a secret!"
+                    Write-Host "##vso[task.complete result=Failed;]Gitleaks Secret Scan Failed"
+                    exit 1
+                }
+          
+                Write-Host "Gitleaks scan passed successfully."
+
 - stage: initandplan
   jobs:
   - job: init
