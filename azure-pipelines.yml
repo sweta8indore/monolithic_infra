@@ -50,7 +50,7 @@ stages:
 
   - job: tflint
     displayName: "TFlint scanning tool"
-    steps:
+    steps:    
       - task: PowerShell@2
         displayName: "TFLint Terraform Scan"
         env:
