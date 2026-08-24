@@ -1,38 +1,68 @@
 trigger: none
 
-pool: cicdpool  
+pool: cicdpool
+
+variables:
+  SKIP_GITLEAKS: 'false'
 
 stages:
+
+# ============================================================
+# GITLEAKS SCANNING
+# ============================================================
+
 - stage: scanningtools
+  displayName: "Security Scanning"
+
   jobs:
   - job: gitleaks
-    steps: 
+    displayName: "Gitleaks Secret Scan"
+
+    steps:
     - task: PowerShell@2
+      displayName: "Gitleaks Secret Scan"
       inputs:
         targetType: 'inline'
         script: |
+
+          if ("$(SKIP_GITLEAKS)" -eq "true") {
+              Write-Host "WARNING: Gitleaks scan has been intentionally skipped."
+              exit 0
+          }
+
           Write-Host "Running Gitleaks secret scan..."
-          
-                gitleaks detect `
-                  --source . `
-                  --config env/dev/.gitleaks.toml `
-                  --verbose `
-                  --redact `
-                  --exit-code 1
-          
-                if ($LASTEXITCODE -ne 0) {
-                    Write-Host "##vso[task.logissue type=error]Gitleaks detected a secret!"
-                    Write-Host "##vso[task.complete result=Failed;]Gitleaks Secret Scan Failed"
-                    exit 1
-                }
-          
-                Write-Host "Gitleaks scan passed successfully."
+
+          gitleaks detect `
+            --source . `
+            --config env/dev/.gitleaks.toml `
+            --verbose `
+            --redact `
+            --exit-code 1
+
+          if ($LASTEXITCODE -ne 0) {
+              Write-Host "##vso[task.logissue type=error]Gitleaks detected a secret!"
+              Write-Host "##vso[task.complete result=Failed;]Gitleaks Secret Scan Failed"
+              exit 1
+          }
+
+          Write-Host "Gitleaks scan passed successfully."
+
+
+# ============================================================
+# TERRAFORM INIT + PLAN
+# ============================================================
 
 - stage: initandplan
+  displayName: "Terraform Init and Plan"
+
   jobs:
   - job: init
-    steps: 
+    displayName: "Terraform Init and Plan"
+
+    steps:
+
     - task: TerraformTask@5
+      displayName: "Terraform Init"
       inputs:
         provider: 'azurerm'
         command: 'init'
@@ -43,12 +73,17 @@ stages:
         backendAzureRmKey: 'dev.terraform.state'
 
     - task: TerraformTask@5
+      displayName: "Terraform Plan"
       inputs:
         provider: 'azurerm'
         command: 'plan'
         workingDirectory: '$(System.DefaultWorkingDirectory)/env/dev'
         environmentServiceNameAzureRM: 'cicdinfra_sc'
 
+
+# ============================================================
+# MANUAL VALIDATION
+# ============================================================
 
 # - stage: manualvlidation
 #   pool: server
@@ -60,10 +95,16 @@ stages:
 #         notifyUsers: 'manoj@nevalosstechnologies.com'
 #         approvers: 'manoj@nevalosstechnologies.com'
 
+
+# ============================================================
+# TERRAFORM APPLY / DESTROY
+# ============================================================
+
 # - stage: initandapply
 #   jobs:
 #   - job: init
-#     steps: 
+#     steps:
+
 #     - task: TerraformTask@5
 #       inputs:
 #         provider: 'azurerm'
