@@ -63,26 +63,25 @@ stages:
                 SKIP_TFLINT: $(SKIP_TFLINT)
               inputs:
                 targetType: 'inline'
-                script: |
+                script: |            
+                Write-Host "SKIP_TFLINT = $env:SKIP_TFLINT"
             
-                  Write-Host "SKIP_TFLINT = $env:SKIP_TFLINT"
+                if ($env:SKIP_TFLINT -eq "true") {
+                    Write-Host "WARNING: TFLint scan has been intentionally skipped."
+                    exit 0
+                }
             
-                  if ($env:SKIP_TFLINT -eq "true") {
-                      Write-Host "WARNING: TFLint scan has been intentionally skipped."
-                      exit 0
-                  }
+                Write-Host "Running TFLint Terraform scan..."
             
-                  Write-Host "Running TFLint Terraform scan..."
+                tflint --chdir=env/dev --format compact
             
-                  tflint --chdir=env/dev --format compact
+                if ($LASTEXITCODE -ne 0) {
+                    Write-Host "##vso[task.logissue type=error]TFLint found Terraform issues!"
+                    Write-Host "##vso[task.complete result=Failed;]TFLint Scan Failed"
+                    exit 1
+                }
             
-                  if ($LASTEXITCODE -ne 0) {
-                      Write-Host "##vso[task.logissue type=error]TFLint found Terraform issues!"
-                      Write-Host "##vso[task.complete result=Failed;]TFLint Scan Failed"
-                      exit 1
-                  }
-            
-                  Write-Host "TFLint scan passed successfully."
+                Write-Host "TFLint scan passed successfully."
 
 
 # ============================================================
