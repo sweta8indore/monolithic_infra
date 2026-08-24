@@ -57,7 +57,17 @@ stages:
         inputs:
           targetType: 'inline'
           script: |
-            if ("$(SKIP_TFLINT)" -eq "true") {
+            - task: PowerShell@2
+              displayName: "TFLint Terraform Scan"
+              env:
+                SKIP_TFLINT: $(SKIP_TFLINT)
+              inputs:
+                targetType: 'inline'
+                script: |
+            
+                  Write-Host "SKIP_TFLINT = $env:SKIP_TFLINT"
+            
+                  if ($env:SKIP_TFLINT -eq "true") {
                       Write-Host "WARNING: TFLint scan has been intentionally skipped."
                       exit 0
                   }
