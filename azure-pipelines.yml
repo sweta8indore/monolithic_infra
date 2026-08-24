@@ -5,6 +5,7 @@ pool: cicdpool
 variables:
   SKIP_GITLEAKS: 'true'
   SKIP_TFLINT: 'true'
+  SKIP_TFSEC: 'false'
 
 stages:
 
@@ -77,6 +78,36 @@ stages:
             }
 
             Write-Host "TFLint scan passed successfully."
+
+  - job: tfsec
+    displayName: "TFsec scanning tool"
+    steps: 
+    - task: PowerShell@2
+      displayName: "tfsec Terraform Security Scan"
+      env:
+        SKIP_TFSEC: $(SKIP_TFSEC)
+      inputs:
+        targetType: 'inline'
+        script: |
+
+          Write-Host "SKIP_TFSEC = $env:SKIP_TFSEC"
+
+          if ($env:SKIP_TFSEC -eq "true") {
+              Write-Host "WARNING: tfsec scan has been intentionally skipped."
+              exit 0
+          }
+
+          Write-Host "Running tfsec Terraform security scan..."
+
+          tfsec env/dev --format default
+
+          if ($LASTEXITCODE -ne 0) {
+              Write-Host "##vso[task.logissue type=error]tfsec found security issues!"
+              Write-Host "##vso[task.complete result=Failed;]tfsec Security Scan Failed"
+              exit 1
+          }
+
+          Write-Host "tfsec scan passed successfully."  
 
 
 # ============================================================
