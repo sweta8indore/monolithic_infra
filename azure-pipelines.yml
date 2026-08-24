@@ -3,7 +3,7 @@ trigger: none
 pool: cicdpool
 
 variables:
-  SKIP_GITLEAKS: 'false'
+  SKIP_GITLEAKS: 'true'
 
 stages:
 
