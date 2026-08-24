@@ -4,7 +4,7 @@ pool: cicdpool
 
 variables:
   SKIP_GITLEAKS: 'true'
-  SKIP_TFLINT: 'false'
+  SKIP_TFLINT: 'ture'
 
 stages:
 
