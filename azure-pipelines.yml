@@ -15,7 +15,7 @@ stages:
           
                 gitleaks detect `
                   --source . `
-                  --config .gitleaks.toml `
+                  --config env/dev/.gitleaks.toml `
                   --verbose `
                   --redact `
                   --exit-code 1
