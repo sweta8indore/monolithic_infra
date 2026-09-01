@@ -2,10 +2,10 @@ trigger: none
 
 pool: cicdpool
 
-variables:
-  SKIP_GITLEAKS: 'true'
-  SKIP_TFLINT: 'true'
-  SKIP_TFSEC: 'true'
+# variables:
+#   SKIP_GITLEAKS: 'true'
+#   SKIP_TFLINT: 'true'
+#   SKIP_TFSEC: 'true'
 
 stages:
 
