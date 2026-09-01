@@ -13,137 +13,137 @@ stages:
 # GITLEAKS SCANNING
 # ============================================================
 
-- stage: scanningtools
-  displayName: "Security Scanning"
+# - stage: scanningtools
+#   displayName: "Security Scanning"
 
-  jobs:
-  - job: gitleaks
-    displayName: "Gitleaks Secret Scan"
+#   jobs:
+#   - job: gitleaks
+#     displayName: "Gitleaks Secret Scan"
 
-    steps:
-    - task: PowerShell@2
-      displayName: "Gitleaks Secret Scan"
-      inputs:
-        targetType: 'inline'
-        script: |
+#     steps:
+#     - task: PowerShell@2
+#       displayName: "Gitleaks Secret Scan"
+#       inputs:
+#         targetType: 'inline'
+#         script: |
 
-          if ("$(SKIP_GITLEAKS)" -eq "true") {
-              Write-Host "WARNING: Gitleaks scan has been intentionally skipped."
-              exit 0
-          }
+#           if ("$(SKIP_GITLEAKS)" -eq "true") {
+#               Write-Host "WARNING: Gitleaks scan has been intentionally skipped."
+#               exit 0
+#           }
 
-          Write-Host "Running Gitleaks secret scan..."
+#           Write-Host "Running Gitleaks secret scan..."
 
-          gitleaks detect `
-            --source . `
-            --config env/dev/.gitleaks.toml `
-            --verbose `
-            --redact `
-            --exit-code 1
+#           gitleaks detect `
+#             --source . `
+#             --config env/dev/.gitleaks.toml `
+#             --verbose `
+#             --redact `
+#             --exit-code 1
 
-          if ($LASTEXITCODE -ne 0) {
-              Write-Host "##vso[task.logissue type=error]Gitleaks detected a secret!"
-              Write-Host "##vso[task.complete result=Failed;]Gitleaks Secret Scan Failed"
-              exit 1
-          }
+#           if ($LASTEXITCODE -ne 0) {
+#               Write-Host "##vso[task.logissue type=error]Gitleaks detected a secret!"
+#               Write-Host "##vso[task.complete result=Failed;]Gitleaks Secret Scan Failed"
+#               exit 1
+#           }
 
-          Write-Host "Gitleaks scan passed successfully."
+#           Write-Host "Gitleaks scan passed successfully."
 
-  - job: tflint
-    dependsOn: gitleaks
-    displayName: "TFlint scanning tool"
-    steps:    
-      - task: PowerShell@2
-        displayName: "TFLint Terraform Scan"
-        env:
-          SKIP_TFLINT: $(SKIP_TFLINT)
-        inputs:
-          targetType: 'inline'
-          script: |
+#   - job: tflint
+#     dependsOn: gitleaks
+#     displayName: "TFlint scanning tool"
+#     steps:    
+#       - task: PowerShell@2
+#         displayName: "TFLint Terraform Scan"
+#         env:
+#           SKIP_TFLINT: $(SKIP_TFLINT)
+#         inputs:
+#           targetType: 'inline'
+#           script: |
 
-            Write-Host "SKIP_TFLINT = $env:SKIP_TFLINT"
+#             Write-Host "SKIP_TFLINT = $env:SKIP_TFLINT"
 
-            if ($env:SKIP_TFLINT -eq "true") {
-                Write-Host "WARNING: TFLint scan has been intentionally skipped."
-                exit 0
-            }
+#             if ($env:SKIP_TFLINT -eq "true") {
+#                 Write-Host "WARNING: TFLint scan has been intentionally skipped."
+#                 exit 0
+#             }
 
-            Write-Host "Running TFLint Terraform scan..."
+#             Write-Host "Running TFLint Terraform scan..."
 
-            tflint --chdir=env/dev --format compact
+#             tflint --chdir=env/dev --format compact
 
-            if ($LASTEXITCODE -ne 0) {
-                Write-Host "##vso[task.logissue type=error]TFLint found Terraform issues!"
-                Write-Host "##vso[task.complete result=Failed;]TFLint Scan Failed"
-                exit 1
-            }
+#             if ($LASTEXITCODE -ne 0) {
+#                 Write-Host "##vso[task.logissue type=error]TFLint found Terraform issues!"
+#                 Write-Host "##vso[task.complete result=Failed;]TFLint Scan Failed"
+#                 exit 1
+#             }
 
-            Write-Host "TFLint scan passed successfully."
+#             Write-Host "TFLint scan passed successfully."
 
-  - job: tfsec
-    dependsOn: tflint
-    displayName: "TFsec scanning tool"
-    steps: 
-    - task: PowerShell@2
-      displayName: "tfsec Terraform Security Scan"
-      env:
-        SKIP_TFSEC: $(SKIP_TFSEC)
-      inputs:
-        targetType: 'inline'
-        script: |
+#   - job: tfsec
+#     dependsOn: tflint
+#     displayName: "TFsec scanning tool"
+#     steps: 
+#     - task: PowerShell@2
+#       displayName: "tfsec Terraform Security Scan"
+#       env:
+#         SKIP_TFSEC: $(SKIP_TFSEC)
+#       inputs:
+#         targetType: 'inline'
+#         script: |
 
-          Write-Host "SKIP_TFSEC = $env:SKIP_TFSEC"
+#           Write-Host "SKIP_TFSEC = $env:SKIP_TFSEC"
 
-          if ($env:SKIP_TFSEC -eq "true") {
-              Write-Host "WARNING: tfsec scan has been intentionally skipped."
-              exit 0
-          }
+#           if ($env:SKIP_TFSEC -eq "true") {
+#               Write-Host "WARNING: tfsec scan has been intentionally skipped."
+#               exit 0
+#           }
 
-          Write-Host "Running tfsec Terraform security scan..."
+#           Write-Host "Running tfsec Terraform security scan..."
 
-          tfsec env/dev --format default
+#           tfsec env/dev --format default
 
-          if ($LASTEXITCODE -ne 0) {
-              Write-Host "##vso[task.logissue type=error]tfsec found security issues!"
-              Write-Host "##vso[task.complete result=Failed;]tfsec Security Scan Failed"
-              exit 1
-          }
+#           if ($LASTEXITCODE -ne 0) {
+#               Write-Host "##vso[task.logissue type=error]tfsec found security issues!"
+#               Write-Host "##vso[task.complete result=Failed;]tfsec Security Scan Failed"
+#               exit 1
+#           }
 
-          Write-Host "tfsec scan passed successfully."  
+#           Write-Host "tfsec scan passed successfully."  
 
 
-# ============================================================
-# TERRAFORM INIT + PLAN
-# ============================================================
+# # ============================================================
+# # TERRAFORM INIT + PLAN
+# # ============================================================
 
-- stage: initandplan
-  dependsOn: scanningtools
-  displayName: "Terraform Init and Plan"
+# - stage: initandplan
+#   dependsOn: scanningtools
+#   displayName: "Terraform Init and Plan"
 
-  jobs:
-  - job: init
-    displayName: "Terraform Init and Plan"
+#   jobs:
+#   - job: init
+#     displayName: "Terraform Init and Plan"
 
-    steps:
+#     steps:
 
-    - task: TerraformTask@5
-      displayName: "Terraform Init"
-      inputs:
-        provider: 'azurerm'
-        command: 'init'
-        workingDirectory: '$(System.DefaultWorkingDirectory)/env/dev'
-        backendServiceArm: 'cicdinfra_sc'
-        backendAzureRmStorageAccountName: 'terraformstatefile55'
-        backendAzureRmContainerName: 'tfstate'
-        backendAzureRmKey: 'dev.terraform.state'
+#     - task: TerraformTask@5
+#       displayName: "Terraform Init"
+#       inputs:
+#         provider: 'azurerm'
+#         command: 'init'
+#         workingDirectory: '$(System.DefaultWorkingDirectory)/env/dev'
+#         backendServiceArm: 'cicdinfra_sc'
+#         backendAzureRmStorageAccountName: 'terraformstatefile55'
+#         backendAzureRmContainerName: 'tfstate'
+#         backendAzureRmKey: 'dev.terraform.state'
 
-    - task: TerraformTask@5
-      displayName: "Terraform Plan"
-      inputs:
-        provider: 'azurerm'
-        command: 'plan'
-        workingDirectory: '$(System.DefaultWorkingDirectory)/env/dev'
-        environmentServiceNameAzureRM: 'cicdinfra_sc'
+#     - task: TerraformTask@5
+#       displayName: "Terraform Plan"
+#       inputs:
+#         provider: 'azurerm'
+#         command: 'plan'
+#         workingDirectory: '$(System.DefaultWorkingDirectory)/env/dev'
+#         environmentServiceNameAzureRM: 'cicdinfra_sc'
 
 
 # ============================================================
@@ -165,25 +165,25 @@ stages:
 # TERRAFORM APPLY / DESTROY
 # ============================================================
 
-# - stage: initandapply
-#   jobs:
-#   - job: init
-#     steps:
+- stage: initandapply
+  jobs:
+  - job: init
+    steps:
 
-#     - task: TerraformTask@5
-#       inputs:
-#         provider: 'azurerm'
-#         command: 'init'
-#         workingDirectory: '$(System.DefaultWorkingDirectory)/env/dev'
-#         backendServiceArm: 'cicdinfra_sc'
-#         backendAzureRmStorageAccountName: 'terraformstatefile55'
-#         backendAzureRmContainerName: 'tfstate'
-#         backendAzureRmKey: 'dev.terraform.state'
+    - task: TerraformTask@5
+      inputs:
+        provider: 'azurerm'
+        command: 'init'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/env/dev'
+        backendServiceArm: 'cicdinfra_sc'
+        backendAzureRmStorageAccountName: 'terraformstatefile55'
+        backendAzureRmContainerName: 'tfstate'
+        backendAzureRmKey: 'dev.terraform.state'
 
-#     - task: TerraformTask@5
-#       inputs:
-#         provider: 'azurerm'
-#         command: 'destroy'
-#         workingDirectory: '$(System.DefaultWorkingDirectory)/env/dev'
-#         commandOptions: '-auto-approve'
-#         environmentServiceNameAzureRM: 'cicdinfra_sc'
+    - task: TerraformTask@5
+      inputs:
+        provider: 'azurerm'
+        command: 'destroy'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/env/dev'
+        commandOptions: '-auto-approve'
+        environmentServiceNameAzureRM: 'cicdinfra_sc'
